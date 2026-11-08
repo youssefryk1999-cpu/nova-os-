@@ -1,0 +1,6 @@
+android_app {
+    name: "NovaSettings",
+    srcs: ["NovaIdentity.java"],
+    platform_apis: true,
+    certificate: "platform",
+}
