@@ -1,0 +1,53 @@
+name: Build NOVA OS ROM
+
+on:
+  workflow_dispatch:
+    inputs:
+      device_code:
+        description: 'Device Codename'
+        required: true
+        default: 'fire'
+      build_type:
+        description: 'Build Type (userdebug/release)'
+        required: true
+        default: 'userdebug'
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Maximize Disk Space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 10240
+          swap-size-mb: 8192
+          remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
+          remove-codeql: 'true'
+
+      - name: Install Build Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bc bison build-type ccache curl flex g++-multilib gcc-multilib git gnupg gperf imagemagick lib32ncurses5-dev lib32z1-dev libelf-dev liblz4-tool libncurses5 libncurses5-dev libsdl1.2-dev libssl-dev libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc yasm zlib1g-dev python3-pip
+
+      - name: Set up Git Configuration
+        run: |
+          git config --global user.name "Youssef Fathi"
+          git config --global user.email "youssefryk1999@gmail.com"
+
+      - name: Initialize and Sync Source (Stub)
+        run: |
+          echo "Preparing NOVA OS build environment for device: ${{ github.event.inputs.device_code }}"
+          mkdir -p out/target/product/${{ github.event.inputs.device_code }}
+          # هنا سيتم وضع أوامر تهيئة الـ Manifest والـ Repo Sync الفعلية عند اكتمال الرابط النهائي للسورس
+          echo "NOVA_OS_BUILD_SUCCESS=true" > build_status.txt
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: nova-os-build-logs
+          path: build_status.txt
